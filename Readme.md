@@ -11,3 +11,7 @@
 
 - Styled Components
 - Types Styled Components
+- React Hook Form
+- Zod
+- @hookform/resolvers
+- Date-fns
