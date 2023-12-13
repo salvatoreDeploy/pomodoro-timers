@@ -1,17 +1,9 @@
-import { createContext, useState } from 'react'
+import { createContext, useReducer, useState } from 'react'
+import { CycleTask, cycleTaskReducer } from '../reducers/cyclesTask'
 
 interface CreateNewCycleData {
   task: string
   minutesAmount: number
-}
-
-interface CycleTask {
-  id: string
-  task: string
-  minutesAmount: number
-  startDate: Date
-  interruptedDate?: Date
-  finishedDate?: Date
 }
 
 interface CyclesTaskType {
@@ -20,7 +12,6 @@ interface CyclesTaskType {
   activeCycleTaskId: string | null
   amountSecondsPassed: number
   markCurrentCycleTaskAsFinished: () => void
-  resetCurrentCycleTask: () => void
   setSecondsPassed: (seconds: number) => void
   createNewCycle: (data: CreateNewCycleData) => void
   interruptCycle: () => void
@@ -33,10 +24,13 @@ interface CyclesTaskProvaiderProps {
 export const CyclesTaskContext = createContext({} as CyclesTaskType)
 
 export function CyclesTaskProvaider({ children }: CyclesTaskProvaiderProps) {
-  const [cycleTask, setCycleTask] = useState<CycleTask[]>([])
-  const [activeCycleTaskId, setActiveCycleTaskId] = useState<string | null>(
-    null,
-  )
+  const [cycleTaskState, dispatch] = useReducer(cycleTaskReducer, {
+    cycleTask: [],
+    activeCycleTaskId: null,
+  })
+
+  const { cycleTask, activeCycleTaskId } = cycleTaskState
+
   const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
 
   const activeCycleTask = cycleTask.find(
@@ -47,20 +41,13 @@ export function CyclesTaskProvaider({ children }: CyclesTaskProvaiderProps) {
     setAmountSecondsPassed(seconds)
   }
 
-  function resetCurrentCycleTask() {
-    setActiveCycleTaskId(null)
-  }
-
   function markCurrentCycleTaskAsFinished() {
-    setCycleTask((cycleTask) =>
-      cycleTask.map((cycle) => {
-        if (cycle.id === activeCycleTaskId) {
-          return { ...cycle, finishedDate: new Date() }
-        } else {
-          return cycle
-        }
-      }),
-    )
+    dispatch({
+      type: 'MARK_CURRENT_CYCLE_AS_FINISHED',
+      payload: {
+        activeCycleTaskId,
+      },
+    })
   }
 
   function createNewCycle(data: CreateNewCycleData) {
@@ -73,24 +60,23 @@ export function CyclesTaskProvaider({ children }: CyclesTaskProvaiderProps) {
       startDate: new Date(),
     }
 
-    setCycleTask((cycleTask) => [...cycleTask, newCycleTask])
-    setActiveCycleTaskId(id)
+    dispatch({
+      type: 'ADD_NEW_CYCLETASK',
+      payload: {
+        newCycleTask,
+      },
+    })
+
     setAmountSecondsPassed(0)
-    // reset()
   }
 
   function interruptCycle() {
-    setCycleTask((cycleTask) =>
-      cycleTask.map((cycle) => {
-        if (cycle.id === activeCycleTaskId) {
-          return { ...cycle, interruptedDate: new Date() }
-        } else {
-          return cycle
-        }
-      }),
-    )
-
-    setActiveCycleTaskId(null)
+    dispatch({
+      type: 'INTERRUPT_CURRENT_CYCLETASK',
+      payload: {
+        activeCycleTaskId,
+      },
+    })
   }
 
   return (
@@ -101,7 +87,6 @@ export function CyclesTaskProvaider({ children }: CyclesTaskProvaiderProps) {
         activeCycleTaskId,
         amountSecondsPassed,
         markCurrentCycleTaskAsFinished,
-        resetCurrentCycleTask,
         setSecondsPassed,
         createNewCycle,
         interruptCycle,
