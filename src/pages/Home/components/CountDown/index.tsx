@@ -9,7 +9,6 @@ export function CountDown() {
     activeCycleTaskId,
     amountSecondsPassed,
     markCurrentCycleTaskAsFinished,
-    resetCurrentCycleTask,
     setSecondsPassed,
   } = useContext(CyclesTaskContext)
 
@@ -41,7 +40,6 @@ export function CountDown() {
         if (secondsDifference >= totalSeconds) {
           markCurrentCycleTaskAsFinished()
           setSecondsPassed(totalSeconds)
-          resetCurrentCycleTask()
           clearInterval(interval)
         } else {
           setSecondsPassed(secondsDifference)
@@ -57,7 +55,6 @@ export function CountDown() {
     totalSeconds,
     activeCycleTaskId,
     markCurrentCycleTaskAsFinished,
-    resetCurrentCycleTask,
     setSecondsPassed,
   ])
 

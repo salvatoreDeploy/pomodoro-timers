@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { ActionTypes } from './actions'
+
 export interface CycleTask {
   id: string
   task: string
@@ -13,12 +15,6 @@ export interface CycleTask {
 interface CycleTaskState {
   cycleTask: CycleTask[]
   activeCycleTaskId: string | null
-}
-
-export enum ActionTypes {
-  ADD_NEW_CYCLETASK = 'ADD_NEW_CYCLETASK',
-  ITERRUPT_CURRENT_CYCLETASK = 'ITERRUPT_CURRENT_CYCLETASK',
-  MARK_CURRENT_CYCLE_AS_FINISHED = 'MARK_CURRENT_CYCLE_AS_FINISHED',
 }
 
 export function cycleTaskReducer(state: CycleTaskState, action: any) {
